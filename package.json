@@ -1,0 +1,134 @@
+{
+  "name": "prisma-extension-attic",
+  "version": "0.1.0",
+  "description": "A type-safe Prisma extension combining PostgreSQL persistence with Redis cache-aside reads and durable write invalidation.",
+  "license": "MIT",
+  "author": "softzer0 <mihailosoft@gmail.com>",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./nestjs": {
+      "import": {
+        "types": "./dist/nestjs.d.ts",
+        "default": "./dist/nestjs.js"
+      },
+      "require": {
+        "types": "./dist/nestjs.d.cts",
+        "default": "./dist/nestjs.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "attic": "./dist/generator/migrate-cli.cjs",
+    "attic-generator": "./dist/generator/cli.cjs"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md",
+    "CONTRIBUTING.md"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@10.13.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/softzer0/attic.git"
+  },
+  "homepage": "https://github.com/softzer0/attic#readme",
+  "bugs": {
+    "url": "https://github.com/softzer0/attic/issues"
+  },
+  "keywords": [
+    "prisma",
+    "postgresql",
+    "redis",
+    "cache",
+    "cache-aside",
+    "nestjs",
+    "typescript"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "benchmark:writes": "pnpm generate:test-client && tsx benchmarks/write-throughput.ts",
+    "clean": "rimraf dist coverage",
+    "generate:test-client": "prisma generate --schema tests/fixtures/prisma/schema.prisma --generator client",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "pnpm generate:test-client && eslint . --max-warnings 0",
+    "typecheck": "pnpm generate:test-client && tsc --noEmit",
+    "test": "pnpm generate:test-client && vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "pnpm generate:test-client && vitest run tests/integration --passWithNoTests",
+    "test:coverage": "vitest run --coverage",
+    "pack:check": "pnpm build && publint && attw --pack . --profile node16",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm pack:check",
+    "prepublishOnly": "pnpm check"
+  },
+  "dependencies": {
+    "@prisma/generator-helper": "7.8.0",
+    "decimal.js": "10.6.0",
+    "redis": "6.1.0",
+    "superjson": "2.2.5"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0 || ^11.0.0",
+    "@prisma/client": "^7.0.0",
+    "reflect-metadata": "^0.2.0",
+    "rxjs": "^7.8.0"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": {
+      "optional": true
+    },
+    "reflect-metadata": {
+      "optional": true
+    },
+    "rxjs": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
+    "@electric-sql/pglite": "0.4.1",
+    "@eslint/js": "9.39.1",
+    "@nestjs/common": "11.1.28",
+    "@nestjs/testing": "11.1.28",
+    "@prisma/adapter-pg": "7.8.0",
+    "@prisma/client": "7.8.0",
+    "@types/node": "22.19.3",
+    "@types/pg": "8.15.6",
+    "@vitest/coverage-v8": "3.2.4",
+    "eslint": "9.39.1",
+    "pg": "8.16.3",
+    "prettier": "3.6.2",
+    "prisma": "7.8.0",
+    "publint": "0.3.12",
+    "reflect-metadata": "0.2.2",
+    "rimraf": "6.0.1",
+    "rxjs": "7.8.2",
+    "tsup": "8.5.0",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.47.0",
+    "vitest": "3.2.4"
+  }
+}

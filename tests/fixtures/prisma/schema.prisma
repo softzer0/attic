@@ -1,0 +1,52 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated"
+  moduleFormat = "esm"
+}
+
+generator attic {
+  provider  = "attic-generator"
+  output    = "../attic-generated"
+  namespace = "attic-tests"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  name     String?
+  posts    Post[]
+  profile  Profile?
+  tags     Tag[]
+
+  @@map("app_users")
+}
+
+model Profile {
+  id      Int    @id @default(autoincrement())
+  bio     String?
+  userId  Int    @unique
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  tags      Tag[]
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[]
+  posts Post[]
+}
