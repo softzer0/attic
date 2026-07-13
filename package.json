@@ -92,7 +92,7 @@
     "@prisma/generator-helper": "7.8.0",
     "decimal.js": "10.6.0",
     "redis": "6.1.0",
-    "superjson": "2.2.5"
+    "superjson": "2.2.6"
   },
   "peerDependencies": {
     "@nestjs/common": "^10.0.0 || ^11.0.0",
