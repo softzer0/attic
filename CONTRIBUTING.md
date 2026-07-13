@@ -26,3 +26,5 @@ Keep changes focused, add tests for behavior changes, and update the public docu
 - Ensure formatting, lint, type, unit, integration, build, and package checks pass.
 
 By contributing, you agree that your contribution is licensed under the MIT License.
+
+Maintainers should follow the [release guide](docs/releasing.md) rather than publishing directly from a development machine.

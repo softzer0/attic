@@ -24,5 +24,6 @@ All notable changes to this project are documented here. This project follows [S
 - An opt-in write-throughput benchmark covering baseline PostgreSQL and Attic write paths.
 - Production guidance for outbox monitoring, Redis outages, backup restoration, retention, and namespace changes.
 - Copyable first-use recipes and clear guidance on the boundary between Attic and Redis-first write-behind systems.
+- GitHub Actions validation across Node.js 22 and 24, dependency update automation, and provenance-enabled npm releases through a protected deployment environment.
 
 [0.1.0]: https://github.com/softzer0/attic/releases/tag/v0.1.0

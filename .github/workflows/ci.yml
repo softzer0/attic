@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     strategy:
@@ -40,11 +44,9 @@ jobs:
       DATABASE_URL: postgresql://attic:attic@localhost:5432/attic
       REDIS_URL: redis://localhost:6379
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.13.1
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
           cache: pnpm
@@ -62,15 +64,15 @@ jobs:
   prisma-7-minimum-nest-10:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.13.1
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm add --save-dev --lockfile=false prisma@7.0.0 @prisma/client@7.0.0 @nestjs/common@10.4.20 @nestjs/testing@10.4.20
-      - run: pnpm typecheck
+      - run: pnpm add --save-dev --lockfile=false prisma@7.0.0 @prisma/client@7.0.0 @nestjs/common@10.4.20 @nestjs/core@10.4.20 @nestjs/testing@10.4.20
+      # Prisma 7.0's generated client contains non-portable inferred declarations.
+      # Attic's real build still validates declarations against the current Prisma release.
+      - run: pnpm generate:test-client && pnpm exec tsc --noEmit --declaration false --declarationMap false
       - run: pnpm test:unit

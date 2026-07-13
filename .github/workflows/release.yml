@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - run: pnpm install --frozen-lockfile
+      - name: Validate release metadata
+        if: github.event_name == 'release'
+        env:
+          RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: >-
+          node --input-type=module --eval
+          "import packageJson from './package.json' with { type: 'json' };
+          const expectedTag = 'v' + packageJson.version;
+          if (process.env.RELEASE_TAG !== expectedTag) throw new Error('Release tag must be ' + expectedTag + '.');
+          const expectedPrerelease = packageJson.version.includes('-');
+          if ((process.env.RELEASE_PRERELEASE === 'true') !== expectedPrerelease)
+          throw new Error('GitHub prerelease state must match package version ' + packageJson.version + '.');"
+      - run: pnpm check
+
+  publish-npm:
+    name: Publish to npm
+    if: github.event_name == 'release'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/prisma-extension-attic
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
+      - name: Install an OIDC-capable npm CLI
+        run: npm install --global npm@11
+      - run: pnpm install --frozen-lockfile
+      - name: Publish package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_DIST_TAG: ${{ github.event.release.prerelease && 'next' || 'latest' }}
+        run: npm publish --access public --tag "$NPM_DIST_TAG"
