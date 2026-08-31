@@ -89,7 +89,7 @@
     "prepublishOnly": "pnpm check"
   },
   "dependencies": {
-    "@prisma/generator-helper": "7.8.0",
+    "@prisma/generator-helper": "7.10.0",
     "decimal.js": "10.6.0",
     "redis": "6.1.0",
     "superjson": "2.2.5"
